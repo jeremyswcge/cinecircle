@@ -1,31 +1,26 @@
 import React, { useState } from 'react';
-import { auth, db, doc, setDoc } from '../lib/firebase';
-import Logo from '../components/Logo';
+import { auth, db, doc, setDoc, serverTimestamp } from '../lib/firebase';
 
-export default function SetupProfile() {
+export default function SetupProfile({ onComplete }: { onComplete: () => void }) {
   const [username, setUsername] = useState('');
-  const [bio, setBio] = useState('');
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!username.trim()) return;
+    if (!username.trim() || !auth.currentUser) return;
+    
     setLoading(true);
     try {
-      const user = auth.currentUser;
-      if (!user) return;
-      await setDoc(doc(db, 'users', user.uid), {
-        uid: user.uid,
-        username: username.trim(),
-        bio: bio.trim(),
-        photoURL: user.photoURL || '',
-        displayName: user.displayName || username.trim(),
-        createdAt: new Date().toISOString(),
-        followers: [],
-        following: []
+      await setDoc(doc(db, 'users', auth.currentUser.uid), {
+        uid: auth.currentUser.uid,
+        username: username.toLowerCase().replace(/[^a-z0-9_]/g, ''),
+        displayName: auth.currentUser.displayName || username,
+        photoURL: auth.currentUser.photoURL || '',
+        createdAt: serverTimestamp()
       });
-    } catch (err) {
-      console.error(err);
+      onComplete();
+    } catch (error) {
+      console.error("Erreur lors de la création du profil:", error);
     } finally {
       setLoading(false);
     }
@@ -33,39 +28,33 @@ export default function SetupProfile() {
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center px-4">
-      <div className="w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-3xl p-8 space-y-6 shadow-2xl">
-        <div className="flex justify-center">
-          <Logo />
-        </div>
-        <h1 className="text-2xl font-bold text-center">Configure ton profil</h1>
-        <form onSubmit={handleSubmit} className="space-y-4">
+      <div className="w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-3xl p-8 shadow-2xl">
+        <h1 className="text-3xl font-bold mb-2">Bienvenue !</h1>
+        <p className="text-zinc-400 mb-8">Choisissez un nom d'utilisateur unique pour commencer.</p>
+        
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <label className="block text-sm text-zinc-400 mb-2">Nom d'utilisateur *</label>
-            <input
-              type="text"
-              value={username}
-              onChange={e => setUsername(e.target.value)}
-              placeholder="@cinephile"
-              className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500 transition-colors"
-              required
-            />
+            <label className="block text-sm font-medium text-zinc-400 mb-2">Nom d'utilisateur</label>
+            <div className="relative">
+              <span className="absolute left-4 top-1/2 -translate-y-1/2 text-zinc-500">@</span>
+              <input 
+                type="text" 
+                value={username}
+                onChange={(e) => setUsername(e.target.value)}
+                placeholder="cinephile_du_75"
+                className="w-full bg-zinc-950 border border-zinc-800 rounded-xl py-3 pl-10 pr-4 text-zinc-100 focus:outline-none focus:border-amber-500 transition-colors"
+                required
+                minLength={3}
+                maxLength={20}
+              />
+            </div>
           </div>
-          <div>
-            <label className="block text-sm text-zinc-400 mb-2">Bio</label>
-            <textarea
-              value={bio}
-              onChange={e => setBio(e.target.value)}
-              placeholder="Cinéphile passionné..."
-              rows={3}
-              className="w-full px-4 py-3 bg-zinc-800 border border-zinc-700 rounded-xl text-white placeholder-zinc-500 focus:outline-none focus:border-amber-500 transition-colors resize-none"
-            />
-          </div>
-          <button
+          <button 
             type="submit"
-            disabled={loading || !username.trim()}
-            className="w-full py-4 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 text-zinc-950 font-semibold rounded-xl transition-colors"
+            disabled={loading || username.length < 3}
+            className="w-full py-4 bg-amber-500 hover:bg-amber-400 disabled:opacity-50 disabled:hover:bg-amber-500 text-zinc-950 font-semibold rounded-xl transition-colors"
           >
-            {loading ? 'Enregistrement...' : 'Commencer'}
+            {loading ? 'Création...' : 'Créer mon profil'}
           </button>
         </form>
       </div>
