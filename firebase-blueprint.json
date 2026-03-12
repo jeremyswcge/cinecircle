@@ -1,0 +1,59 @@
+{
+  "services": {
+    "firestore": {
+      "enabled": true,
+      "collections": [
+        {
+          "name": "users",
+          "description": "User profiles",
+          "fields": [
+            {"name": "uid", "type": "string"},
+            {"name": "username", "type": "string"},
+            {"name": "bio", "type": "string"},
+            {"name": "photoURL", "type": "string"},
+            {"name": "displayName", "type": "string"},
+            {"name": "createdAt", "type": "string"},
+            {"name": "followers", "type": "array"},
+            {"name": "following", "type": "array"}
+          ]
+        },
+        {
+          "name": "reviews",
+          "description": "Movie/TV show reviews",
+          "fields": [
+            {"name": "userId", "type": "string"},
+            {"name": "mediaId", "type": "number"},
+            {"name": "mediaType", "type": "string"},
+            {"name": "mediaTitle", "type": "string"},
+            {"name": "mediaPosterPath", "type": "string"},
+            {"name": "rating", "type": "number"},
+            {"name": "comment", "type": "string"},
+            {"name": "createdAt", "type": "timestamp"}
+          ]
+        },
+        {
+          "name": "chats",
+          "description": "Chat rooms",
+          "fields": [
+            {"name": "participants", "type": "array"},
+            {"name": "lastMessage", "type": "string"},
+            {"name": "updatedAt", "type": "timestamp"}
+          ]
+        },
+        {
+          "name": "top10",
+          "description": "User top 10 lists",
+          "fields": [
+            {"name": "userId", "type": "string"},
+            {"name": "items", "type": "array"},
+            {"name": "updatedAt", "type": "timestamp"}
+          ]
+        }
+      ]
+    },
+    "auth": {
+      "enabled": true,
+      "providers": ["google"]
+    }
+  }
+}
