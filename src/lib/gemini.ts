@@ -6,7 +6,7 @@ export const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 export async function getCineBuddySuggestions(userMessage: string) {
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-3-flash-preview',
+      model: 'gemini-2.0-flash',
       contents: `Tu es CineBuddy, un concierge cinéma expert et chaleureux.
 L'utilisateur te dit : "${userMessage}"
 Réponds en français. Si l'utilisateur demande une recommandation, propose 3 films ou séries. S'il pose une question générale sur le cinéma, réponds-y directement et chaleureusement.`,
