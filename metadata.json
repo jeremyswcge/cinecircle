@@ -1,0 +1,5 @@
+{
+  "name": "CineCircle",
+  "description": "Un réseau social pour partager des recommandations de films et séries avec Firebase, TMDB et Gemini.",
+  "requestFramePermissions": []
+}
